@@ -1,4 +1,4 @@
-package chronorec::task;
+package ChronoRec::Task;
 
 use namespace::autoclean;
 
@@ -22,7 +22,7 @@ has date_created =>
 
 has sessions =>
 	is			=> 'ro',
-	isa			=> 'ArrayRef[chronorec::task::session]',
+	isa			=> 'ArrayRef[ChronoRec::Task::Session]',
 	default		=> sub { [] },
 	traits		=> [ 'Array' ],
 	handles		=> {
@@ -51,11 +51,12 @@ sub is_active
 
 sub duration
 {
-	my $self = shift;
+	my $self	= shift;
+	my $window	= shift;
 
 	my $total = new DateTime::Duration;
 
-	$total += $_->duration foreach $self->get_all_sessions;
+	$total += $_->duration($window) foreach $self->get_all_sessions;
 
 	return $total->clock_duration;
 }
@@ -66,7 +67,7 @@ sub start
 
 	return if $self->is_active;
 
-	$self->add_session(new chronorec::task::session);
+	$self->add_session(new ChronoRec::Task::Session);
 }
 
 sub stop

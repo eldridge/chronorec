@@ -1,9 +1,11 @@
-package chronorec::task::session;
+package ChronoRec::Task::Session;
 
 use namespace::autoclean;
 
 use Moose;
 use MooseX::Storage;
+
+use DateTime::Span;
 
 with Storage format => 'YAML', io => 'File';
 
@@ -19,12 +21,14 @@ has date_stop =>
 
 sub duration
 {
-	my $self = shift;
+	my $self	= shift;
+	my $window	= shift;
 
 	my $start	= $self->date_start;
 	my $stop	= $self->date_stop || DateTime->now(time_zone => 'local');
+	my $span	= DateTime::Span->from_datetimes(start => $start, end => $stop);
 
-	return $stop - $start;
+	return $window->intersection($span)->duration;
 }
 
 1;
